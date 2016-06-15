@@ -15,6 +15,7 @@
  */
 package com.duckheader.stock.service.impl;
 
+import com.duckheader.stock.persistence.entity.Company;
 import com.duckheader.stock.persistence.entity.Trade;
 import com.duckheader.stock.service.StockService;
 import com.duckheader.stock.service.TaskService;
@@ -41,22 +42,28 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void scheduleStockTradeTask() {
-        String stockCode = "sz002177";
-        TimerTask task = new GetStockTradeTask(stockCode);
+        List<Company> companies = stockService.getAllCompanies();
+        TimerTask task = new GetStockTradeTask(companies);
         ScheduleManager scheduleManager = new ScheduleManager(18, ScheduleManager.POLICY_BY_DAY, task);
         scheduleManager.schedule();
     }
 
     private class GetStockTradeTask extends TimerTask {
 
-        private String stockCode;
+        private List<Company> companies;
 
-        public GetStockTradeTask(String stockCode) {
-            this.stockCode = stockCode;
+        public GetStockTradeTask(List<Company> companies) {
+            this.companies = companies;
         }
 
         @Override
         public void run() {
+            for (Company company : companies) {
+                fetchTradeListAndSave(company.getStockCode());
+            }
+        }
+
+        private void fetchTradeListAndSave(String stockCode) {
             Calendar calendar = Calendar.getInstance();
             int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
             if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {

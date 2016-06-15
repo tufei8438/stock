@@ -23,6 +23,7 @@ import com.duckheader.stock.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StockServiceImpl implements StockService {
@@ -50,5 +51,16 @@ public class StockServiceImpl implements StockService {
     @Override
     public Company getCompany(String stockCode) {
         return companyRepository.findByStockCode(stockCode);
+    }
+
+    @Override
+    public List<Company> getAllCompanies() {
+        List<Company> companies = new ArrayList<>();
+        Iterable<Company> companyIterable = companyRepository.findAll();
+        for (Company company : companyIterable) {
+            companies.add(company);
+        }
+
+        return companies;
     }
 }

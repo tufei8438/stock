@@ -29,4 +29,6 @@ public interface StockService {
     void saveCompany(Company company);
 
     Company getCompany(String stockCode);
+
+    List<Company> getAllCompanies();
 }
