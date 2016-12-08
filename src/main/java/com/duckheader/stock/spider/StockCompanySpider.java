@@ -55,6 +55,11 @@ public class StockCompanySpider {
         Company company = new Company();
         company.setStockCode(stockCode);
         company.setLegalName(findTableText(document, "法定名称"));
+        // 如果页面抓取到的法定名称为空,则表明没有此代码,返回null
+        if (StringUtils.isEmpty(company.getLegalName())) {
+            return null;
+        }
+
         company.setEnglishName(findTableText(document, "英文名称"));
         String issuePrice = findTableText(document, "发行价格(元)");
         if (issuePrice == null || !StringUtils.isNumeric(issuePrice)) {

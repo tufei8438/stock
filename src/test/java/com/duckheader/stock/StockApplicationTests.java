@@ -46,8 +46,8 @@ public class StockApplicationTests {
 
     @Test
     public void getAllTradeByStockCode() {
-        Date endDate = new Date(116, 3, 26);
-        Date startDate = new Date(116, 4, 25);
+        Date endDate = new Date(116, 5, 12);
+        Date startDate = new Date(116, 5, 15);
         StockTradeRunnable runnable = new StockTradeRunnable("sz002177", stockService, startDate, endDate);
         Thread thread = new Thread(runnable);
         thread.start();
@@ -55,6 +55,24 @@ public class StockApplicationTests {
             thread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void getAllCompanyAndSave() {
+        for (int i = 0; i < 2000; ++i) {
+            String stockCode = "sh" + String.valueOf(600000 + i);
+            StockCompanySpider spider = new StockCompanySpider(stockCode);
+            Company company = spider.getCompanyInfo();
+            if (company != null) {
+                companyRepository.save(company);
+            }
+
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
