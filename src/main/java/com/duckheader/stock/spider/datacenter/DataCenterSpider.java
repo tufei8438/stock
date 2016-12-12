@@ -31,7 +31,9 @@ public abstract class DataCenterSpider {
 
     private static Logger logger = LoggerFactory.getLogger(DataCenterSpider.class);
 
-    public List<String> fetch() {
+    private static String SPIDER_URL = "http://stock.qq.com/data/dctr_modules/ggsj.htm";
+
+    public List<StockInfo> fetch() {
         try {
             String html = getWebHtml(getSpiderUrl());
             Document document = Jsoup.parse(html);
@@ -52,7 +54,11 @@ public abstract class DataCenterSpider {
         return htmlPage.asXml();
     }
 
-    protected abstract List<String> fetchByDocument(Document document);
+    protected abstract List<StockInfo> fetchByDocument(Document document);
 
-    protected abstract String getSpiderUrl();
+    public String getSpiderUrl() {
+        return String.format("%s?t=%s", SPIDER_URL, getSpiderCategory());
+    }
+
+    protected abstract int getSpiderCategory();
 }

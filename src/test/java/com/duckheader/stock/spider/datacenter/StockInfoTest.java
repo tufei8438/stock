@@ -37,10 +37,11 @@ public class StockInfoTest {
         try {
             HtmlPage htmlPage = webClient.getPage("http://stock.qq.com/data/dctr_modules/ggsj.htm?t=5&change_color_0");
             Document document = Jsoup.parse(htmlPage.asXml());
-            Element element = document.select("div#ggsj_3_ctn").first();
+            Element element = document.select("div#ggsj_5_ctn").first();
             Element tr = element.select("tr.alC").first();
             StockInfo stockInfo = new StockInfo();
             stockInfo.parseFromTrTag(tr);
+            System.out.println(stockInfo);
         } catch (IOException e) {
             e.printStackTrace();
         }

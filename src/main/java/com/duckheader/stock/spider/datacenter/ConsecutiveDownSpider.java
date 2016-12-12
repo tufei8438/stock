@@ -25,22 +25,25 @@ import java.util.List;
 public class ConsecutiveDownSpider extends DataCenterSpider {
 
     @Override
-    protected List<String> fetchByDocument(Document document) {
-        List<String> stocks = new ArrayList<>();
+    protected List<StockInfo> fetchByDocument(Document document) {
+        List<StockInfo> stocks = new ArrayList<>();
         Element element = document.select("div#ggsj_3_ctn").first();
         if (element == null) {
             return stocks;
         }
 
-        Iterator<Element> trIterator = element.select("tr.alC").iterator();
-        while (trIterator.hasNext()) {
-            Element tr = trIterator.next();
+        for (Element tr : element.select("tr.alC")) {
+            ConsecutiveStockInfo stockInfo = new ConsecutiveStockInfo();
+            stockInfo.parseFromTrTag(tr);
+            stocks.add(stockInfo);
         }
+
         return stocks;
     }
 
     @Override
-    protected String getSpiderUrl() {
-        return "http://stock.qq.com/data/#lxxd";
+    protected int getSpiderCategory() {
+        // 连续下跌
+        return 3;
     }
 }

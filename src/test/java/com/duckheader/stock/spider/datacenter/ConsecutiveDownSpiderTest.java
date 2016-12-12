@@ -15,22 +15,18 @@
  */
 package com.duckheader.stock.spider.datacenter;
 
-import org.jsoup.nodes.Element;
+import org.junit.Test;
 
-public class ConsecutiveStockInfo extends StockInfo {
+import java.util.List;
 
-    private int days;
+public class ConsecutiveDownSpiderTest {
 
-    public int getDays() {
-        return days;
-    }
-
-    public void setDays(int days) {
-        this.days = days;
-    }
-
-    @Override
-    protected void parseExtFromTdTag(Element td) {
-        this.days = getInteger(td);
+    @Test
+    public void testFetch() {
+        ConsecutiveDownSpider spider = new ConsecutiveDownSpider();
+        List<StockInfo> stockInfos = spider.fetch();
+        for (StockInfo stockInfo : stockInfos) {
+            System.out.println(stockInfo);
+        }
     }
 }

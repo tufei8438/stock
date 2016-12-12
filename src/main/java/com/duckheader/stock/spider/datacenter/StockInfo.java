@@ -15,9 +15,18 @@
  */
 package com.duckheader.stock.spider.datacenter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StockInfo {
+
+    private static Logger logger = LoggerFactory.getLogger(StockInfo.class);
+
     private int ranking;
     private String code;
     private String name;
@@ -33,7 +42,75 @@ public class StockInfo {
     public void parseFromTrTag(Element tr) {
         Element th = tr.select("th").first();
         if (th != null) {
-            System.out.println(th.toString());
+            this.ranking = Integer.valueOf(th.text());
+        }
+
+        Elements tdList = tr.select("td");
+        if (tdList.isEmpty() || tdList.size() != 11) {
+            return;
+        }
+
+        this.code = tdList.get(0).text();
+        this.name = tdList.get(1).text();
+        this.parseExtFromTdTag(tdList.get(2));
+        this.price = getFloat(tdList.get(3));
+        this.priceChangePercent = getPercent(tdList.get(4));
+        this.priceChange = getFloat(tdList.get(5));
+        this.startPrice = getFloat(tdList.get(6));
+        this.maxPrice = getFloat(tdList.get(7));
+        this.minPrice = getFloat(tdList.get(8));
+        this.volume = getInteger(tdList.get(9));
+        this.money = getInteger(tdList.get(10));
+    }
+
+    protected void parseExtFromTdTag(Element td) {
+
+    }
+
+    protected float getFloat(Element element) {
+        String text = element.text();
+        try {
+            return Float.valueOf(text);
+        } catch (NumberFormatException e) {
+            logger.warn(String.format("格式化文本:%s出错,不是一个有效的浮点类型", text), e);
+            return 0.0f;
+        }
+    }
+
+    protected float getPercent(Element element) {
+        String text = element.text();
+        if (text.endsWith("%")) {
+            String nText = text.replace("%", "");
+            try {
+                return Float.valueOf(nText);
+            } catch (NumberFormatException e) {
+                logger.warn(String.format("格式化文本:%s出错,不是一个有效的百分比数据类型", text), e);
+                return 0.0f;
+            }
+        } else {
+            logger.warn(String.format("格式化文本:%s出错,不是一个有效的百分比数据类型", text));
+            return 0.0f;
+        }
+    }
+
+    protected int getInteger(Element element) {
+        String text = element.text();
+        if (StringUtils.isNumeric(text)) {
+            return Integer.valueOf(text);
+        } else {
+            logger.warn(String.format("格式化文本:%s出错,不是一个有效的整数类型", text));
+            return 0;
+        }
+    }
+
+    @Override
+    public String toString() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
